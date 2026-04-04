@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <style>
       body {
         font-family: Helvetica, Arial, sans-serif;
@@ -121,7 +121,12 @@
           <td class="label">Ano</td>
           <td class="value" th:text="${vm.ano}">-</td>
           <td class="label">KM Total</td>
-          <td class="value" th:text="${#numbers.formatDecimal(vm.km, 1, 'POINT', 2, 'COMMA')} + ' km'">-</td>
+          <td
+            class="value"
+            th:text="${#numbers.formatDecimal(vm.km, 1, 'POINT', 2, 'COMMA')} + ' km'"
+          >
+            -
+          </td>
         </tr>
       </table>
 
@@ -143,22 +148,29 @@
             <td>
               <span class="by-label">por </span>
               <span th:text="${m.funcionarioSaida}">-</span>
-              <br/>
+              <br />
               <span th:text="${m.dateSaida}">-</span>
             </td>
             <td>
-              <span th:if="${m.voltaPendente}" class="pending-badge">Pendente</span>
+              <span th:if="${m.voltaPendente}" class="pending-badge"
+                >Pendente</span
+              >
               <span th:unless="${m.voltaPendente}">
                 <span class="by-label">por </span>
                 <span th:text="${m.funcionarioVolta}">-</span>
-                <br/>
+                <br />
                 <span th:text="${m.dateVolta}">-</span>
               </span>
             </td>
             <td>
-              <span th:if="${m.kmPercorrido != null}"
-                    th:text="${#numbers.formatDecimal(m.kmPercorrido, 1, 'POINT', 2, 'COMMA')} + ' km'">-</span>
-              <span th:unless="${m.kmPercorrido != null}" class="muted">--</span>
+              <span
+                th:if="${m.kmPercorrido != null}"
+                th:text="${#numbers.formatDecimal(m.kmPercorrido, 1, 'POINT', 2, 'COMMA')} + ' km'"
+                >-</span
+              >
+              <span th:unless="${m.kmPercorrido != null}" class="muted"
+                >--</span
+              >
             </td>
           </tr>
         </tbody>
