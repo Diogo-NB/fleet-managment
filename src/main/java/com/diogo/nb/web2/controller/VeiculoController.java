@@ -8,6 +8,8 @@ import com.diogo.nb.web2.query.veiculo.GetVeiculoDetailsQuery;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoDetailsQueryHandler;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoListQuery;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoListQueryHandler;
+import com.diogo.nb.web2.query.veiculo.GetVeiculoRelatorioQuery;
+import com.diogo.nb.web2.query.veiculo.GetVeiculoRelatorioQueryHandler;
 import com.diogo.nb.web2.usecase.veiculo.CreateVeiculoUseCase;
 import com.diogo.nb.web2.usecase.veiculo.DeleteVeiculoCommand;
 import com.diogo.nb.web2.usecase.veiculo.DeleteVeiculoUseCase;
@@ -18,6 +20,9 @@ import com.diogo.nb.web2.usecase.veiculo.RegisterVoltaUseCase;
 import com.diogo.nb.web2.usecase.veiculo.UpdateVeiculoCommand;
 import com.diogo.nb.web2.usecase.veiculo.UpdateVeiculoUseCase;
 import com.diogo.nb.web2.viewmodel.VeiculoFormViewModel;
+import com.diogo.nb.web2.viewmodel.VeiculoRelatorioViewModel;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +32,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/veiculos")
@@ -37,6 +46,8 @@ public class VeiculoController {
     private final GetCreateVeiculoFormQueryHandler getCreateVeiculoFormQueryHandler;
     private final GetEditVeiculoFormQueryHandler getEditVeiculoFormQueryHandler;
     private final GetVeiculoDetailsQueryHandler getVeiculoDetailsQueryHandler;
+    private final GetVeiculoRelatorioQueryHandler getVeiculoRelatorioQueryHandler;
+    private final SpringTemplateEngine templateEngine;
     private final CreateVeiculoUseCase createVeiculoUseCase;
     private final UpdateVeiculoUseCase updateVeiculoUseCase;
     private final DeleteVeiculoUseCase deleteVeiculoUseCase;
@@ -114,5 +125,24 @@ public class VeiculoController {
         registerVoltaUseCase.execute(new RegisterVoltaCommand(id, funcVoltaId, kmPercorrido));
         model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
         return "veiculo/fragments :: details-content";
+    }
+
+    @GetMapping("/{id}/relatorio")
+    public void relatorio(@PathVariable Long id, HttpServletResponse response) throws Exception {
+        VeiculoRelatorioViewModel vm = getVeiculoRelatorioQueryHandler.execute(new GetVeiculoRelatorioQuery(id));
+
+        Context ctx = new Context();
+        ctx.setVariable("vm", vm);
+        String html = templateEngine.process("veiculo/relatorio", ctx);
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=\"relatorio-" + vm.getPlaca() + ".pdf\"");
+
+        try (OutputStream os = response.getOutputStream()) {
+            new PdfRendererBuilder()
+                    .withHtmlContent(html, null)
+                    .toStream(os)
+                    .run();
+        }
     }
 }

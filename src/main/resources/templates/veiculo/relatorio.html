@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8"/>
+    <style>
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 11px;
+        color: #1a1a1a;
+        margin: 0;
+        padding: 0;
+      }
+      .page {
+        padding: 40px;
+      }
+      .header {
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+      .header h1 {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0 0 4px 0;
+        color: #111827;
+      }
+      .header .placa {
+        font-size: 13px;
+        color: #6b7280;
+        font-family: monospace;
+      }
+      .meta-table {
+        width: 100%;
+        margin-bottom: 28px;
+        border-collapse: collapse;
+      }
+      .meta-table td {
+        padding: 6px 12px 6px 0;
+        font-size: 11px;
+        color: #374151;
+      }
+      .meta-table td.label {
+        color: #6b7280;
+        width: 80px;
+      }
+      .meta-table td.value {
+        font-weight: bold;
+        color: #111827;
+      }
+      .section-title {
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        margin-bottom: 8px;
+      }
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .history-table thead tr {
+        background-color: #f3f4f6;
+      }
+      .history-table th {
+        font-size: 9px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6b7280;
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .history-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+        vertical-align: top;
+      }
+      .history-table tr:last-child td {
+        border-bottom: none;
+      }
+      .pending-badge {
+        font-size: 9px;
+        color: #92400e;
+        background-color: #fef3c7;
+        padding: 2px 6px;
+        border-radius: 9999px;
+      }
+      .muted {
+        color: #9ca3af;
+      }
+      .by-label {
+        color: #9ca3af;
+        font-size: 10px;
+      }
+      .empty-row td {
+        text-align: center;
+        color: #9ca3af;
+        padding: 24px;
+      }
+      .footer {
+        margin-top: 32px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+        font-size: 9px;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <h1 th:text="${vm.modelo}">Modelo</h1>
+        <span class="placa" th:text="${vm.placa}">PLACA</span>
+      </div>
+
+      <table class="meta-table">
+        <tr>
+          <td class="label">Ano</td>
+          <td class="value" th:text="${vm.ano}">-</td>
+          <td class="label">KM Total</td>
+          <td class="value" th:text="${#numbers.formatDecimal(vm.km, 1, 'POINT', 2, 'COMMA')} + ' km'">-</td>
+        </tr>
+      </table>
+
+      <div class="section-title">Histórico de Movimentações</div>
+
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Saída</th>
+            <th>Volta</th>
+            <th>KM Percorrido</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(vm.movimentacoes)}" class="empty-row">
+            <td colspan="3">Nenhuma movimentação registrada.</td>
+          </tr>
+          <tr th:each="m : ${vm.movimentacoes}">
+            <td>
+              <span class="by-label">por </span>
+              <span th:text="${m.funcionarioSaida}">-</span>
+              <br/>
+              <span th:text="${m.dateSaida}">-</span>
+            </td>
+            <td>
+              <span th:if="${m.voltaPendente}" class="pending-badge">Pendente</span>
+              <span th:unless="${m.voltaPendente}">
+                <span class="by-label">por </span>
+                <span th:text="${m.funcionarioVolta}">-</span>
+                <br/>
+                <span th:text="${m.dateVolta}">-</span>
+              </span>
+            </td>
+            <td>
+              <span th:if="${m.kmPercorrido != null}"
+                    th:text="${#numbers.formatDecimal(m.kmPercorrido, 1, 'POINT', 2, 'COMMA')} + ' km'">-</span>
+              <span th:unless="${m.kmPercorrido != null}" class="muted">--</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footer">
+        Relatório gerado em <span th:text="${vm.geradoEm}">-</span>
+      </div>
+    </div>
+  </body>
+</html>

@@ -61,7 +61,7 @@
               <td class="px-4 py-3 text-gray-600" th:text="${v.ano}"></td>
               <td
                 class="px-4 py-3 text-gray-600"
-                th:text="${#numbers.formatDecimal(v.km, 1, 'POINT', 0, 'COMMA')} + ' km'"
+                th:text="${#numbers.formatDecimal(v.km, 1, 'POINT', 2, 'COMMA')} + ' km'"
               ></td>
               <td class="px-4 py-3">
                 <span
