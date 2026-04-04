@@ -34,6 +34,7 @@ build/
 
 ### Local env ###
 .env
+keystore.p12
 
 ### Node ###
 node_modules/
