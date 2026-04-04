@@ -1,3 +1,3 @@
 package com.diogo.nb.web2.query.veiculo;
 
-public record GetVeiculoRelatorioQuery(Long id) {}
+public record GetVeiculoRelatorioQuery() {}

@@ -34,7 +34,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.TemplateSpec;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 @Controller
@@ -127,22 +130,26 @@ public class VeiculoController {
         return "veiculo/fragments :: details-content";
     }
 
-    @GetMapping("/{id}/relatorio")
-    public void relatorio(@PathVariable Long id, HttpServletResponse response) throws Exception {
-        VeiculoRelatorioViewModel vm = getVeiculoRelatorioQueryHandler.execute(new GetVeiculoRelatorioQuery(id));
+    @GetMapping("/relatorio")
+    public void relatorio(HttpServletResponse response) throws Exception {
+        VeiculoRelatorioViewModel vm = getVeiculoRelatorioQueryHandler.execute(new GetVeiculoRelatorioQuery());
 
         Context ctx = new Context();
         ctx.setVariable("vm", vm);
-        String html = templateEngine.process("veiculo/relatorio", ctx);
+        String html = templateEngine.process(new TemplateSpec("veiculo/relatorio", TemplateMode.XML), ctx);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new PdfRendererBuilder()
+                .withHtmlContent(html, null)
+                .toStream(baos)
+                .run();
 
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=\"relatorio-" + vm.getPlaca() + ".pdf\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"relatorio-movimentacoes.pdf\"");
+        response.setContentLength(baos.size());
 
         try (OutputStream os = response.getOutputStream()) {
-            new PdfRendererBuilder()
-                    .withHtmlContent(html, null)
-                    .toStream(os)
-                    .run();
+            baos.writeTo(os);
         }
     }
 }

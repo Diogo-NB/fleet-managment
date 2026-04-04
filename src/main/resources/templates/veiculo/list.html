@@ -16,14 +16,23 @@
 
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-xl font-semibold text-gray-900">Veículos</h1>
-        <a
-          sec:authorize="hasRole('ADMINISTRADOR')"
-          th:href="@{/veiculos/novo}"
-          class="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-        >
-          <i class="bi bi-plus-lg text-base leading-none"></i>
-          Novo Veículo
-        </a>
+        <div class="flex items-center gap-2">
+          <a
+            th:href="@{/veiculos/relatorio}"
+            class="flex items-center gap-1.5 border border-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-50"
+          >
+            <i class="bi bi-file-earmark-pdf text-base leading-none"></i>
+            Exportar PDF
+          </a>
+          <a
+            sec:authorize="hasRole('ADMINISTRADOR')"
+            th:href="@{/veiculos/novo}"
+            class="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+          >
+            <i class="bi bi-plus-lg text-base leading-none"></i>
+            Novo Veículo
+          </a>
+        </div>
       </div>
 
       <div class="bg-white rounded-lg shadow overflow-hidden">

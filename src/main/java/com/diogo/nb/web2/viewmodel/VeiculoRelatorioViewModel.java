@@ -7,12 +7,17 @@ import java.util.List;
 @Data
 public class VeiculoRelatorioViewModel {
 
-    private String modelo;
-    private String placa;
-    private Integer ano;
-    private Double km;
     private String geradoEm;
-    private List<MovimentacaoRow> movimentacoes;
+    private List<VeiculoGroup> veiculos;
+
+    @Data
+    public static class VeiculoGroup {
+        private String modelo;
+        private String placa;
+        private Integer ano;
+        private Double km;
+        private List<MovimentacaoRow> movimentacoes;
+    }
 
     @Data
     public static class MovimentacaoRow {
