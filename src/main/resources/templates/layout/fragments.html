@@ -1,0 +1,62 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="head(title)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <title th:text="${title}">App</title>
+  </head>
+
+  <body>
+    <nav th:fragment="nav(currentSection)">
+      <nav class="bg-slate-800 text-white px-6 h-12 flex items-center gap-6">
+        <a
+          th:href="@{/veiculos}"
+          th:class="${currentSection == 'veiculos'} ? 'text-sm text-white font-semibold' : 'text-sm text-slate-300 hover:text-white transition-colors'"
+          >Veículos</a
+        >
+        <a
+          th:href="@{/funcionarios}"
+          th:class="${currentSection == 'funcionarios'} ? 'text-sm text-white font-semibold' : 'text-sm text-slate-300 hover:text-white transition-colors'"
+          >Funcionários</a
+        >
+      </nav>
+    </nav>
+
+    <span
+      th:fragment="statusBadge(status)"
+      th:with="cls=${status.name() == 'DISPONIVEL' ? 'bg-green-100 text-green-800' : (status.name() == 'INDISPONIVEL' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800')}"
+      th:class="${'inline-block text-xs px-2 py-0.5 rounded-full font-medium ' + cls}"
+      th:text="${status.descricao}"
+      >Status</span
+    >
+
+    <div th:fragment="deleteButton(action)">
+      <form
+        method="post"
+        th:action="${action}"
+        class="inline"
+        onsubmit="return confirm('Tem certeza?');"
+      >
+        <button
+          type="submit"
+          class="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 cursor-pointer"
+        >
+          <i class="bi bi-trash text-base leading-none"></i>
+          Excluir
+        </button>
+      </form>
+    </div>
+
+    <a
+      th:fragment="cancelLink(href)"
+      th:href="${href}"
+      class="text-sm text-gray-500 hover:text-gray-700"
+      >Cancelar</a
+    >
+  </body>
+</html>

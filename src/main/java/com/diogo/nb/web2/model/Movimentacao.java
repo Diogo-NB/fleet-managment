@@ -36,4 +36,8 @@ public class Movimentacao {
         this.volta = LocalDateTime.now();
         this.kmPercorrido = kmPercorrido;
     }
+
+    public boolean isVoltaPendente() {
+        return funcVoltaId == null && volta == null;
+    }
 }

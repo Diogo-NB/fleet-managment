@@ -1,0 +1,105 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout/fragments :: head('Veículos')}"></head>
+  <body class="min-h-screen bg-gray-50">
+    <nav th:replace="~{layout/fragments :: nav('veiculos')}"></nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+      <div
+        th:if="${erro}"
+        class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm"
+        th:text="${erro}"
+      ></div>
+
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-xl font-semibold text-gray-900">Veículos</h1>
+        <a
+          th:href="@{/veiculos/novo}"
+          class="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+        >
+          <i class="bi bi-plus-lg text-base leading-none"></i>
+          Novo Veículo
+        </a>
+      </div>
+
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr
+              class="bg-gray-50 border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500"
+            >
+              <th class="px-4 py-3 font-medium">Modelo</th>
+              <th class="px-4 py-3 font-medium">Placa</th>
+              <th class="px-4 py-3 font-medium">Ano</th>
+              <th class="px-4 py-3 font-medium">KM</th>
+              <th class="px-4 py-3 font-medium">Status</th>
+              <th class="px-4 py-3 font-medium">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(vm.veiculos)}">
+              <td colspan="6" class="px-4 py-10 text-center text-gray-400">
+                Nenhum veículo cadastrado.
+              </td>
+            </tr>
+            <tr
+              th:each="v : ${vm.veiculos}"
+              class="border-b border-gray-100 last:border-0 hover:bg-gray-50"
+            >
+              <td
+                class="px-4 py-3 font-medium text-gray-900"
+                th:text="${v.modelo}"
+              ></td>
+              <td
+                class="px-4 py-3 text-gray-600 font-mono"
+                th:text="${v.placa}"
+              ></td>
+              <td class="px-4 py-3 text-gray-600" th:text="${v.ano}"></td>
+              <td
+                class="px-4 py-3 text-gray-600"
+                th:text="${#numbers.formatDecimal(v.km, 1, 'POINT', 0, 'COMMA')} + ' km'"
+              ></td>
+              <td class="px-4 py-3">
+                <span
+                  th:replace="~{layout/fragments :: statusBadge(${v.status})}"
+                ></span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <a
+                    th:if="${v.status.name() == 'DISPONIVEL'}"
+                    th:href="@{/veiculos/{id}/saida(id=${v.id})}"
+                    class="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    <i class="bi bi-box-arrow-right text-base leading-none"></i>
+                    Saída
+                  </a>
+                  <a
+                    th:if="${v.status.name() == 'INDISPONIVEL'}"
+                    th:href="@{/veiculos/{id}/volta(id=${v.id})}"
+                    class="flex items-center gap-1 text-sm text-green-600 hover:text-green-800"
+                  >
+                    <i
+                      class="bi bi-box-arrow-in-left text-base leading-none"
+                    ></i>
+                    Volta
+                  </a>
+                  <a
+                    th:href="@{/veiculos/{id}/editar(id=${v.id})}"
+                    class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    <i class="bi bi-pencil text-base leading-none"></i>
+                    Editar
+                  </a>
+                  <div
+                    th:replace="~{layout/fragments :: deleteButton(@{/veiculos/{id}/excluir(id=${v.id})})}"
+                  ></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

@@ -3,7 +3,9 @@ package com.diogo.nb.web2.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,13 +34,14 @@ public class Veiculo {
     private Double km = 0.0;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "status_veiculo")
     private StatusVeiculo status = StatusVeiculo.DISPONIVEL;
 
     private LocalDateTime dataExclusao;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "veiculo_id")
+    @JoinColumn(name = "veiculo_id", nullable = false)
     private List<Movimentacao> movimentacoes = new ArrayList<>();
 
     public void registrarSaida(Long funcSaidaId) {
