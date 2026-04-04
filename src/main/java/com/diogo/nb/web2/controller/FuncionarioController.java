@@ -35,13 +35,15 @@ public class FuncionarioController {
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("vm", getFuncionarioListQueryHandler.execute(new GetFuncionarioListQuery()));
+        var vm = getFuncionarioListQueryHandler.execute(new GetFuncionarioListQuery());
+        model.addAttribute("vm", vm);
         return "funcionario/list";
     }
 
     @GetMapping("/novo")
     public String createForm(Model model) {
-        model.addAttribute("vm", getCreateFuncionarioFormQueryHandler.execute(new GetCreateFuncionarioFormQuery()));
+        var vm = getCreateFuncionarioFormQueryHandler.execute(new GetCreateFuncionarioFormQuery());
+        model.addAttribute("vm", vm);
         return "funcionario/form";
     }
 
@@ -53,7 +55,8 @@ public class FuncionarioController {
 
     @GetMapping("/{id}/editar")
     public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getEditFuncionarioFormQueryHandler.execute(new GetEditFuncionarioFormQuery(id)));
+        var vm = getEditFuncionarioFormQueryHandler.execute(new GetEditFuncionarioFormQuery(id));
+        model.addAttribute("vm", vm);
         return "funcionario/form";
     }
 

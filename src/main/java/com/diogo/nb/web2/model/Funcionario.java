@@ -25,7 +25,7 @@ public class Funcionario {
 
     private LocalDateTime dataExclusao;
 
-    public void softDelete() {
+    public void delete() {
         this.dataExclusao = LocalDateTime.now();
     }
 }

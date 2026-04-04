@@ -1,5 +1,6 @@
 package com.diogo.nb.web2.query.veiculo;
 
+import com.diogo.nb.web2.model.Funcionario;
 import com.diogo.nb.web2.model.Movimentacao;
 import com.diogo.nb.web2.model.StatusVeiculo;
 import com.diogo.nb.web2.model.Veiculo;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +30,13 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
     private final FuncionarioRepository funcionarioRepository;
     private final MovimentacaoRepository movimentacaoRepository;
 
-    private final DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
     public VeiculoDetailsViewModel execute(GetVeiculoDetailsQuery query) {
         Veiculo v = veiculoRepository.findById(query.id()).orElseThrow();
+        Map<Long, Funcionario> funcionariosById = funcionarioRepository.getAllMapped();
+
         VeiculoDetailsViewModel vm = new VeiculoDetailsViewModel();
 
         vm.setId(v.getId());
@@ -44,11 +48,11 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
 
         List<MovimentacaoRow> movimentacaoRows = movimentacaoRepository.findByVeiculoIdOrderBySaidaDesc(v.getId())
                 .stream()
-                .map(this::createMovimentacaoRow)
+                .map(m -> createMovimentacaoRow(m, funcionariosById))
                 .toList();
         vm.setMovimentacoes(movimentacaoRows);
 
-        List<FuncionarioOption> funcionarios = funcionarioRepository.findAll().stream()
+        List<FuncionarioOption> funcionarios = funcionariosById.values().stream()
                 .map(f -> {
                     FuncionarioOption opt = new FuncionarioOption();
                     opt.setId(f.getId());
@@ -59,34 +63,35 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         vm.setFuncionarios(funcionarios);
 
         movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).ifPresentOrElse(
-                m -> vm.setSaidaPendente(m.getSaida().format(dateFormater)),
+                m -> vm.setSaidaPendente(m.getSaida().format(dateFormatter)),
                 () -> vm.setPodeRegistrarSaida(v.getStatus() == StatusVeiculo.DISPONIVEL));
 
         return vm;
     }
 
-    private MovimentacaoRow createMovimentacaoRow(Movimentacao m) {
+    private MovimentacaoRow createMovimentacaoRow(Movimentacao m, Map<Long, Funcionario> funcionariosById) {
         MovimentacaoRow row = new MovimentacaoRow();
 
         row.setId(m.getId());
         row.setVoltaPendente(m.isVoltaPendente());
         row.setKmPercorrido(m.getKmPercorrido());
 
-        String funcionarioSaida = funcionarioRepository.findById(
-                m.getFuncSaidaId()).map(f -> f.getNome()).orElse("--");
-        row.setFuncionarioSaida(funcionarioSaida);
-        row.setDateSaida(m.getSaida().format(dateFormater));
+        row.setFuncionarioSaida(getNome(funcionariosById, m.getFuncSaidaId()));
+        row.setDateSaida(m.getSaida().format(dateFormatter));
 
         if (m.isVoltaPendente()) {
             row.setFuncionarioVolta("--");
             row.setDateVolta("--");
         } else {
-            String funcionarioVolta = funcionarioRepository.findById(
-                    m.getFuncVoltaId()).map(f -> f.getNome()).orElse("--");
-            row.setFuncionarioVolta(funcionarioVolta);
-            row.setDateVolta(m.getVolta().format(dateFormater));
+            row.setFuncionarioVolta(getNome(funcionariosById, m.getFuncVoltaId()));
+            row.setDateVolta(m.getVolta().format(dateFormatter));
         }
 
         return row;
+    }
+
+    private String getNome(Map<Long, Funcionario> funcionariosById, Long id) {
+        Funcionario f = funcionariosById.get(id);
+        return f != null ? f.getNome() : "--";
     }
 }

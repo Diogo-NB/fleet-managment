@@ -17,7 +17,7 @@ public class DeleteFuncionarioUseCase implements UseCase<DeleteFuncionarioComman
     @Override
     public void execute(DeleteFuncionarioCommand command) {
         Funcionario f = funcionarioRepository.findById(command.id()).orElseThrow();
-        f.softDelete();
+        f.delete();
         funcionarioRepository.save(f);
     }
 }

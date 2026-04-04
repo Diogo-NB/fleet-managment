@@ -1,5 +1,6 @@
 package com.diogo.nb.web2.query.veiculo;
 
+import com.diogo.nb.web2.model.Funcionario;
 import com.diogo.nb.web2.model.Movimentacao;
 import com.diogo.nb.web2.model.Veiculo;
 import com.diogo.nb.web2.query.QueryHandler;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +32,9 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
 
     @Override
     public VeiculoRelatorioViewModel execute(GetVeiculoRelatorioQuery query) {
+        Map<Long, Funcionario> funcionariosById = funcionarioRepository.getAllMapped();
         List<VeiculoGroup> groups = veiculoRepository.findAll().stream()
-                .map(this::toGroup)
+                .map(v -> toGroup(v, funcionariosById))
                 .toList();
 
         VeiculoRelatorioViewModel vm = new VeiculoRelatorioViewModel();
@@ -40,10 +43,10 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
         return vm;
     }
 
-    private VeiculoGroup toGroup(Veiculo v) {
+    private VeiculoGroup toGroup(Veiculo v, Map<Long, Funcionario> funcionariosById) {
         List<MovimentacaoRow> rows = v.getMovimentacoes().stream()
                 .sorted(Comparator.comparing(Movimentacao::getSaida).reversed())
-                .map(this::toRow)
+                .map(m -> toRow(m, funcionariosById))
                 .toList();
 
         VeiculoGroup group = new VeiculoGroup();
@@ -55,24 +58,26 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
         return group;
     }
 
-    private MovimentacaoRow toRow(Movimentacao m) {
-        String funcSaidaNome = funcionarioRepository.findById(m.getFuncSaidaId()).map(f -> f.getNome()).orElse("--");
-
+    private MovimentacaoRow toRow(Movimentacao m, Map<Long, Funcionario> funcionariosById) {
         MovimentacaoRow row = new MovimentacaoRow();
         row.setVoltaPendente(m.isVoltaPendente());
         row.setKmPercorrido(m.getKmPercorrido());
         row.setDateSaida(m.getSaida().format(dateFormatter));
-        row.setFuncionarioSaida(funcSaidaNome);
+        row.setFuncionarioSaida(getNome(funcionariosById, m.getFuncSaidaId()));
 
         if (m.isVoltaPendente()) {
             row.setFuncionarioVolta("--");
             row.setDateVolta("--");
         } else {
-            String funcVoltaNome = funcionarioRepository.findById(m.getFuncVoltaId()).map(f -> f.getNome()).orElse("--");
-            row.setFuncionarioVolta(funcVoltaNome);
+            row.setFuncionarioVolta(getNome(funcionariosById, m.getFuncVoltaId()));
             row.setDateVolta(m.getVolta().format(dateFormatter));
         }
 
         return row;
+    }
+
+    private String getNome(Map<Long, Funcionario> funcionariosById, Long id) {
+        Funcionario f = funcionariosById.get(id);
+        return f != null ? f.getNome() : "--";
     }
 }

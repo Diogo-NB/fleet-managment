@@ -59,13 +59,15 @@ public class VeiculoController {
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("vm", getVeiculoListQueryHandler.execute(new GetVeiculoListQuery()));
+        var vm = getVeiculoListQueryHandler.execute(new GetVeiculoListQuery());
+        model.addAttribute("vm", vm);
         return "veiculo/list";
     }
 
     @GetMapping("/novo")
     public String createForm(Model model) {
-        model.addAttribute("vm", getCreateVeiculoFormQueryHandler.execute(new GetCreateVeiculoFormQuery()));
+        var vm = getCreateVeiculoFormQueryHandler.execute(new GetCreateVeiculoFormQuery());
+        model.addAttribute("vm", vm);
         return "veiculo/form";
     }
 
@@ -77,7 +79,8 @@ public class VeiculoController {
 
     @GetMapping("/{id}/editar")
     public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getEditVeiculoFormQueryHandler.execute(new GetEditVeiculoFormQuery(id)));
+        var vm = getEditVeiculoFormQueryHandler.execute(new GetEditVeiculoFormQuery(id));
+        model.addAttribute("vm", vm);
         return "veiculo/form";
     }
 
@@ -95,19 +98,22 @@ public class VeiculoController {
 
     @GetMapping("/{id}/detalhes")
     public String details(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        var vm = getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id));
+        model.addAttribute("vm", vm);
         return "veiculo/detalhes";
     }
 
     @GetMapping("/{id}/saida-form")
     public String saidaForm(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        var vm = getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id));
+        model.addAttribute("vm", vm);
         return "veiculo/fragments :: saida-form";
     }
 
     @GetMapping("/{id}/volta-form")
     public String voltaForm(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        var vm = getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id));
+        model.addAttribute("vm", vm);
         return "veiculo/fragments :: volta-form";
     }
 
@@ -116,7 +122,8 @@ public class VeiculoController {
             @RequestParam Long funcSaidaId,
             Model model) {
         registerSaidaUseCase.execute(new RegisterSaidaCommand(id, funcSaidaId));
-        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        var vm = getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id));
+        model.addAttribute("vm", vm);
         return "veiculo/fragments :: details-content";
     }
 
@@ -126,7 +133,8 @@ public class VeiculoController {
             @RequestParam Double kmPercorrido,
             Model model) {
         registerVoltaUseCase.execute(new RegisterVoltaCommand(id, funcVoltaId, kmPercorrido));
-        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        var vm = getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id));
+        model.addAttribute("vm", vm);
         return "veiculo/fragments :: details-content";
     }
 

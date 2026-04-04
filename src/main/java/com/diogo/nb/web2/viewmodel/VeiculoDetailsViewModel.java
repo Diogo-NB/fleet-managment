@@ -27,7 +27,7 @@ public class VeiculoDetailsViewModel {
         private String dateSaida;
         private String dateVolta;
         private Double kmPercorrido;
-        private boolean isVoltaPendente;
+        private boolean voltaPendente;
     }
 
     @Data
