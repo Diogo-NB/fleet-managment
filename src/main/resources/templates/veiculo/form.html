@@ -63,8 +63,7 @@
                   th:if="${vm.id != null}"
                   class="text-gray-400 font-normal"
                 >
-                  (somente leitura)</span
-                >
+                </span>
               </label>
               <input
                 type="number"
@@ -84,6 +83,8 @@
             >
             <select
               th:field="*{status}"
+              th:disabled="${vm.statusBloqueado}"
+              th:classappend="${vm.statusBloqueado} ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''"
               class="border border-gray-300 rounded px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option
@@ -92,6 +93,18 @@
                 th:text="${s.descricao}"
               ></option>
             </select>
+            <input
+              th:if="${vm.statusBloqueado}"
+              type="hidden"
+              th:field="*{status}"
+            />
+            <p
+              th:if="${vm.statusBloqueado}"
+              class="mt-1 text-xs text-amber-600"
+            >
+              Não é possível alterar o status enquanto há uma movimentação com
+              volta pendente.
+            </p>
           </div>
 
           <div class="flex items-center gap-4 pt-2">
@@ -101,7 +114,9 @@
             >
               Salvar
             </button>
-            <a th:replace="~{layout/fragments :: cancelLink(${vm.id == null ? '/veiculos' : '/veiculos/' + vm.id + '/detalhes'})}"></a>
+            <a
+              th:replace="~{layout/fragments :: cancelLink(${vm.id == null ? '/veiculos' : '/veiculos/' + vm.id + '/detalhes'})}"
+            ></a>
           </div>
         </form>
       </div>

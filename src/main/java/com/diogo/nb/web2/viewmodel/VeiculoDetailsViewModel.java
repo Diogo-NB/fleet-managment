@@ -17,6 +17,7 @@ public class VeiculoDetailsViewModel {
     private List<MovimentacaoRow> movimentacoes;
     private List<FuncionarioOption> funcionarios;
     private String saidaPendente;
+    private boolean podeRegistrarSaida;
 
     @Data
     public static class MovimentacaoRow {

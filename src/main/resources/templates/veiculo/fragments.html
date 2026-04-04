@@ -146,7 +146,7 @@
 
         <div class="mt-5 flex items-center gap-3 flex-wrap">
           <button
-            th:if="${vm.status.name() == 'DISPONIVEL'}"
+            th:if="${vm.podeRegistrarSaida}"
             th:attr="hx-get=@{/veiculos/{id}/saida-form(id=${vm.id})}"
             hx-target="#action-panel"
             hx-swap="innerHTML"
@@ -156,7 +156,7 @@
             Registrar Saída
           </button>
           <button
-            th:if="${vm.status.name() == 'INDISPONIVEL'}"
+            th:if="${vm.saidaPendente != null}"
             th:attr="hx-get=@{/veiculos/{id}/volta-form(id=${vm.id})}"
             hx-target="#action-panel"
             hx-swap="innerHTML"

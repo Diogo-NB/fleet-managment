@@ -3,6 +3,7 @@ package com.diogo.nb.web2.query.veiculo;
 import com.diogo.nb.web2.model.StatusVeiculo;
 import com.diogo.nb.web2.model.Veiculo;
 import com.diogo.nb.web2.query.QueryHandler;
+import com.diogo.nb.web2.repository.MovimentacaoRepository;
 import com.diogo.nb.web2.repository.VeiculoRepository;
 import com.diogo.nb.web2.viewmodel.VeiculoFormViewModel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 public class GetEditVeiculoFormQueryHandler implements QueryHandler<GetEditVeiculoFormQuery, VeiculoFormViewModel> {
 
     private final VeiculoRepository veiculoRepository;
+    private final MovimentacaoRepository movimentacaoRepository;
 
     @Override
     public VeiculoFormViewModel execute(GetEditVeiculoFormQuery query) {
@@ -29,6 +31,7 @@ public class GetEditVeiculoFormQueryHandler implements QueryHandler<GetEditVeicu
         vm.setKm(v.getKm());
         vm.setStatus(v.getStatus());
         vm.setStatusOptions(Arrays.asList(StatusVeiculo.values()));
+        vm.setStatusBloqueado(movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).isPresent());
         return vm;
     }
 }

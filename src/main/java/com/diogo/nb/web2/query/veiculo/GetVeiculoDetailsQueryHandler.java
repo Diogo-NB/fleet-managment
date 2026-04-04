@@ -1,6 +1,7 @@
 package com.diogo.nb.web2.query.veiculo;
 
 import com.diogo.nb.web2.model.Movimentacao;
+import com.diogo.nb.web2.model.StatusVeiculo;
 import com.diogo.nb.web2.model.Veiculo;
 import com.diogo.nb.web2.query.QueryHandler;
 import com.diogo.nb.web2.repository.FuncionarioRepository;
@@ -57,8 +58,9 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
                 .toList();
         vm.setFuncionarios(funcionarios);
 
-        movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId())
-                .ifPresent(m -> vm.setSaidaPendente(m.getSaida().format(dateFormater)));
+        movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).ifPresentOrElse(
+                m -> vm.setSaidaPendente(m.getSaida().format(dateFormater)),
+                () -> vm.setPodeRegistrarSaida(v.getStatus() == StatusVeiculo.DISPONIVEL));
 
         return vm;
     }

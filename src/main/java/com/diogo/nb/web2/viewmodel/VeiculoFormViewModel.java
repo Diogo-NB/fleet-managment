@@ -15,4 +15,5 @@ public class VeiculoFormViewModel {
     private Double km;
     private StatusVeiculo status;
     private List<StatusVeiculo> statusOptions;
+    private boolean statusBloqueado;
 }
