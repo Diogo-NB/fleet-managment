@@ -41,7 +41,8 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         vm.setPlaca(v.getPlaca());
         vm.setStatus(v.getStatus());
 
-        List<MovimentacaoRow> movimentacaoRows = movimentacaoRepository.findByVeiculoIdOrderBySaidaDesc(v.getId()).stream()
+        List<MovimentacaoRow> movimentacaoRows = movimentacaoRepository.findByVeiculoIdOrderBySaidaDesc(v.getId())
+                .stream()
                 .map(this::createMovimentacaoRow)
                 .toList();
         vm.setMovimentacoes(movimentacaoRows);

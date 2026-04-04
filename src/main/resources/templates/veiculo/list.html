@@ -1,5 +1,8 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
   <head th:replace="~{layout/fragments :: head('Veículos')}"></head>
   <body class="min-h-screen bg-gray-50">
     <nav th:replace="~{layout/fragments :: nav('veiculos')}"></nav>
@@ -14,6 +17,7 @@
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-xl font-semibold text-gray-900">Veículos</h1>
         <a
+          sec:authorize="hasRole('ADMINISTRADOR')"
           th:href="@{/veiculos/novo}"
           class="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
         >

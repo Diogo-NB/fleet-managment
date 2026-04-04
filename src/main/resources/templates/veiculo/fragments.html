@@ -1,9 +1,13 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
   <body>
-
     <div th:fragment="saida-form" class="bg-white rounded-lg shadow p-6 mt-4">
-      <h2 class="text-base font-semibold text-gray-900 mb-4">Registrar Saída</h2>
+      <h2 class="text-base font-semibold text-gray-900 mb-4">
+        Registrar Saída
+      </h2>
       <form
         th:attr="hx-post=@{/veiculos/{id}/saida(id=${vm.id})}"
         hx-target="#details-content"
@@ -11,7 +15,9 @@
         class="space-y-4"
       >
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Funcionário</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Funcionário</label
+          >
           <select
             name="funcSaidaId"
             required
@@ -44,7 +50,9 @@
     </div>
 
     <div th:fragment="volta-form" class="bg-white rounded-lg shadow p-6 mt-4">
-      <h2 class="text-base font-semibold text-gray-900 mb-1">Registrar Volta</h2>
+      <h2 class="text-base font-semibold text-gray-900 mb-1">
+        Registrar Volta
+      </h2>
       <p
         th:if="${vm.saidaPendente != null}"
         class="text-sm text-gray-500 mb-4"
@@ -57,7 +65,9 @@
         class="space-y-4"
       >
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Funcionário</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Funcionário</label
+          >
           <select
             name="funcVoltaId"
             required
@@ -72,7 +82,9 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">KM Percorrido</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >KM Percorrido</label
+          >
           <input
             type="number"
             name="kmPercorrido"
@@ -101,19 +113,35 @@
     </div>
 
     <div th:fragment="details-content" id="details-content">
-
       <div class="bg-white rounded-lg shadow p-6 mb-4">
         <div class="flex items-start justify-between">
           <div>
-            <h1 class="text-xl font-semibold text-gray-900" th:text="${vm.modelo}"></h1>
-            <p class="text-sm text-gray-500 font-mono mt-0.5" th:text="${vm.placa}"></p>
+            <h1
+              class="text-xl font-semibold text-gray-900"
+              th:text="${vm.modelo}"
+            ></h1>
+            <p
+              class="text-sm text-gray-500 font-mono mt-0.5"
+              th:text="${vm.placa}"
+            ></p>
           </div>
-          <span th:replace="~{layout/fragments :: statusBadge(${vm.status})}"></span>
+          <span
+            th:replace="~{layout/fragments :: statusBadge(${vm.status})}"
+          ></span>
         </div>
 
         <div class="mt-4 flex gap-6 text-sm text-gray-600">
-          <span>Ano: <span class="font-medium text-gray-900" th:text="${vm.ano}"></span></span>
-          <span>KM: <span class="font-medium text-gray-900" th:text="${#numbers.formatDecimal(vm.km, 1, 'POINT', 0, 'COMMA')} + ' km'"></span></span>
+          <span
+            >Ano:
+            <span class="font-medium text-gray-900" th:text="${vm.ano}"></span
+          ></span>
+          <span
+            >KM:
+            <span
+              class="font-medium text-gray-900"
+              th:text="${#numbers.formatDecimal(vm.km, 1, 'POINT', 0, 'COMMA')} + ' km'"
+            ></span
+          ></span>
         </div>
 
         <div class="mt-5 flex items-center gap-3 flex-wrap">
@@ -138,13 +166,17 @@
             Registrar Volta
           </button>
           <a
+            sec:authorize="hasRole('ADMINISTRADOR')"
             th:href="@{/veiculos/{id}/editar(id=${vm.id})}"
             class="flex items-center gap-1.5 border border-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-50"
           >
             <i class="bi bi-pencil text-base leading-none"></i>
             Editar
           </a>
-          <div th:replace="~{layout/fragments :: deleteButton(@{/veiculos/{id}/excluir(id=${vm.id})})}"></div>
+          <div
+            sec:authorize="hasRole('ADMINISTRADOR')"
+            th:replace="~{layout/fragments :: deleteButton(@{/veiculos/{id}/excluir(id=${vm.id})})}"
+          ></div>
         </div>
       </div>
 
@@ -152,11 +184,17 @@
 
       <div class="bg-white rounded-lg shadow overflow-hidden mt-4">
         <div class="px-6 py-4 border-b border-gray-100">
-          <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Histórico de Movimentações</h2>
+          <h2
+            class="text-sm font-semibold text-gray-700 uppercase tracking-wide"
+          >
+            Histórico de Movimentações
+          </h2>
         </div>
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50 border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
+            <tr
+              class="bg-gray-50 border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500"
+            >
               <th class="px-4 py-3 font-medium">Saída</th>
               <th class="px-4 py-3 font-medium">Volta</th>
               <th class="px-4 py-3 font-medium">KM Percorrido</th>
@@ -173,27 +211,45 @@
               class="border-b border-gray-100 last:border-0 hover:bg-gray-50"
             >
               <td class="px-4 py-3 text-gray-600">
-                <span class="text-gray-400 text-xs mr-1">por</span><span class="font-medium text-gray-800" th:text="${m.funcionarioSaida}"></span><span class="text-gray-400 text-xs mx-1">às</span><span th:text="${m.dateSaida}"></span>
+                <span class="text-gray-400 text-xs mr-1">por</span
+                ><span
+                  class="font-medium text-gray-800"
+                  th:text="${m.funcionarioSaida}"
+                ></span
+                ><span class="text-gray-400 text-xs mx-1">às</span
+                ><span th:text="${m.dateSaida}"></span>
               </td>
               <td class="px-4 py-3">
                 <span
                   th:if="${m.voltaPendente}"
                   class="inline-block w-fit text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-800"
-                >Pendente</span>
+                  >Pendente</span
+                >
                 <span th:unless="${m.voltaPendente}" class="text-gray-600">
-                  <span class="text-gray-400 text-xs mr-1">por</span><span class="font-medium text-gray-800" th:text="${m.funcionarioVolta}"></span><span class="text-gray-400 text-xs mx-1">às</span><span th:text="${m.dateVolta}"></span>
+                  <span class="text-gray-400 text-xs mr-1">por</span
+                  ><span
+                    class="font-medium text-gray-800"
+                    th:text="${m.funcionarioVolta}"
+                  ></span
+                  ><span class="text-gray-400 text-xs mx-1">às</span
+                  ><span th:text="${m.dateVolta}"></span>
                 </span>
               </td>
               <td class="px-4 py-3 text-gray-600">
-                <span th:if="${m.kmPercorrido != null}" th:text="${#numbers.formatDecimal(m.kmPercorrido, 1, 'POINT', 0, 'COMMA')} + ' km'"></span>
-                <span th:unless="${m.kmPercorrido != null}" class="text-gray-400">--</span>
+                <span
+                  th:if="${m.kmPercorrido != null}"
+                  th:text="${#numbers.formatDecimal(m.kmPercorrido, 1, 'POINT', 0, 'COMMA')} + ' km'"
+                ></span>
+                <span
+                  th:unless="${m.kmPercorrido != null}"
+                  class="text-gray-400"
+                  >--</span
+                >
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
     </div>
-
   </body>
 </html>
