@@ -1,2 +1,21 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org"></html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout/fragments :: head('Detalhes do Veículo')}"></head>
+  <body class="min-h-screen bg-gray-50">
+    <nav th:replace="~{layout/fragments :: nav('veiculos')}"></nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+      <div class="mb-6">
+        <a
+          th:href="@{/veiculos}"
+          class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 w-fit"
+        >
+          <i class="bi bi-arrow-left text-base leading-none"></i>
+          Voltar para Veículos
+        </a>
+      </div>
+
+      <div th:replace="~{veiculo/fragments :: details-content}"></div>
+    </main>
+  </body>
+</html>

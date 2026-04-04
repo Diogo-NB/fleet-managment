@@ -14,8 +14,9 @@ public class VeiculoDetailsViewModel {
     private Integer ano;
     private Double km;
     private StatusVeiculo status;
-    private List<StatusVeiculo> statusOptions;
     private List<MovimentacaoRow> movimentacoes;
+    private List<FuncionarioOption> funcionarios;
+    private String saidaPendente;
 
     @Data
     public static class MovimentacaoRow {
@@ -26,5 +27,11 @@ public class VeiculoDetailsViewModel {
         private String dateVolta;
         private Double kmPercorrido;
         private boolean isVoltaPendente;
+    }
+
+    @Data
+    public static class FuncionarioOption {
+        private Long id;
+        private String nome;
     }
 }

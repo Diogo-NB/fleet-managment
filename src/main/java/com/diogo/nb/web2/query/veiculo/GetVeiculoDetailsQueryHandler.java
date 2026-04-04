@@ -1,12 +1,13 @@
 package com.diogo.nb.web2.query.veiculo;
 
 import com.diogo.nb.web2.model.Movimentacao;
-import com.diogo.nb.web2.model.StatusVeiculo;
 import com.diogo.nb.web2.model.Veiculo;
 import com.diogo.nb.web2.query.QueryHandler;
 import com.diogo.nb.web2.repository.FuncionarioRepository;
+import com.diogo.nb.web2.repository.MovimentacaoRepository;
 import com.diogo.nb.web2.repository.VeiculoRepository;
 import com.diogo.nb.web2.viewmodel.VeiculoDetailsViewModel;
+import com.diogo.nb.web2.viewmodel.VeiculoDetailsViewModel.FuncionarioOption;
 import com.diogo.nb.web2.viewmodel.VeiculoDetailsViewModel.MovimentacaoRow;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
 
     private final VeiculoRepository veiculoRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final MovimentacaoRepository movimentacaoRepository;
 
     private final DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -38,12 +40,24 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         vm.setModelo(v.getModelo());
         vm.setPlaca(v.getPlaca());
         vm.setStatus(v.getStatus());
-        vm.setStatusOptions(List.of(StatusVeiculo.values()));
 
-        List<MovimentacaoRow> movimentacaoRows = v.getMovimentacoes().stream().map(m -> createMovimentacaoRow(m))
+        List<MovimentacaoRow> movimentacaoRows = movimentacaoRepository.findByVeiculoIdOrderBySaidaDesc(v.getId()).stream()
+                .map(this::createMovimentacaoRow)
                 .toList();
-
         vm.setMovimentacoes(movimentacaoRows);
+
+        List<FuncionarioOption> funcionarios = funcionarioRepository.findAll().stream()
+                .map(f -> {
+                    FuncionarioOption opt = new FuncionarioOption();
+                    opt.setId(f.getId());
+                    opt.setNome(f.getNome());
+                    return opt;
+                })
+                .toList();
+        vm.setFuncionarios(funcionarios);
+
+        movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId())
+                .ifPresent(m -> vm.setSaidaPendente(m.getSaida().format(dateFormater)));
 
         return vm;
     }
@@ -52,7 +66,7 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         MovimentacaoRow row = new MovimentacaoRow();
 
         row.setId(m.getId());
-        row.setVoltaPendente(row.isVoltaPendente());
+        row.setVoltaPendente(m.isVoltaPendente());
         row.setKmPercorrido(m.getKmPercorrido());
 
         String funcionarioSaida = funcionarioRepository.findById(
@@ -63,11 +77,9 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         if (m.isVoltaPendente()) {
             row.setFuncionarioVolta("--");
             row.setDateVolta("--");
-
         } else {
             String funcionarioVolta = funcionarioRepository.findById(
                     m.getFuncVoltaId()).map(f -> f.getNome()).orElse("--");
-
             row.setFuncionarioVolta(funcionarioVolta);
             row.setDateVolta(m.getVolta().format(dateFormater));
         }

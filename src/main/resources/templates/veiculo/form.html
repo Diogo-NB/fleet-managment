@@ -101,7 +101,7 @@
             >
               Salvar
             </button>
-            <a th:replace="~{layout/fragments :: cancelLink('/veiculos')}"></a>
+            <a th:replace="~{layout/fragments :: cancelLink(${vm.id == null ? '/veiculos' : '/veiculos/' + vm.id + '/detalhes'})}"></a>
           </div>
         </form>
       </div>

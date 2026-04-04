@@ -4,14 +4,10 @@ import com.diogo.nb.web2.query.veiculo.GetCreateVeiculoFormQuery;
 import com.diogo.nb.web2.query.veiculo.GetCreateVeiculoFormQueryHandler;
 import com.diogo.nb.web2.query.veiculo.GetEditVeiculoFormQuery;
 import com.diogo.nb.web2.query.veiculo.GetEditVeiculoFormQueryHandler;
-import com.diogo.nb.web2.query.veiculo.GetSaidaFormQuery;
-import com.diogo.nb.web2.query.veiculo.GetSaidaFormQueryHandler;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoDetailsQuery;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoDetailsQueryHandler;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoListQuery;
 import com.diogo.nb.web2.query.veiculo.GetVeiculoListQueryHandler;
-import com.diogo.nb.web2.query.veiculo.GetVoltaFormQuery;
-import com.diogo.nb.web2.query.veiculo.GetVoltaFormQueryHandler;
 import com.diogo.nb.web2.usecase.veiculo.CreateVeiculoUseCase;
 import com.diogo.nb.web2.usecase.veiculo.DeleteVeiculoCommand;
 import com.diogo.nb.web2.usecase.veiculo.DeleteVeiculoUseCase;
@@ -21,10 +17,7 @@ import com.diogo.nb.web2.usecase.veiculo.RegisterVoltaCommand;
 import com.diogo.nb.web2.usecase.veiculo.RegisterVoltaUseCase;
 import com.diogo.nb.web2.usecase.veiculo.UpdateVeiculoCommand;
 import com.diogo.nb.web2.usecase.veiculo.UpdateVeiculoUseCase;
-import com.diogo.nb.web2.viewmodel.VeiculoDetailsViewModel;
 import com.diogo.nb.web2.viewmodel.VeiculoFormViewModel;
-import com.diogo.nb.web2.viewmodel.VeiculoSaidaViewModel;
-import com.diogo.nb.web2.viewmodel.VeiculoVoltaViewModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/veiculos")
@@ -43,14 +36,12 @@ public class VeiculoController {
     private final GetVeiculoListQueryHandler getVeiculoListQueryHandler;
     private final GetCreateVeiculoFormQueryHandler getCreateVeiculoFormQueryHandler;
     private final GetEditVeiculoFormQueryHandler getEditVeiculoFormQueryHandler;
-    private final GetSaidaFormQueryHandler getSaidaFormQueryHandler;
-    private final GetVoltaFormQueryHandler getVoltaFormQueryHandler;
+    private final GetVeiculoDetailsQueryHandler getVeiculoDetailsQueryHandler;
     private final CreateVeiculoUseCase createVeiculoUseCase;
     private final UpdateVeiculoUseCase updateVeiculoUseCase;
     private final DeleteVeiculoUseCase deleteVeiculoUseCase;
     private final RegisterSaidaUseCase registerSaidaUseCase;
     private final RegisterVoltaUseCase registerVoltaUseCase;
-    private final GetVeiculoDetailsQueryHandler getVeiculoDetailsQuery;
 
     @GetMapping
     public String list(Model model) {
@@ -79,7 +70,7 @@ public class VeiculoController {
     @PostMapping("/{id}/editar")
     public String update(@PathVariable Long id, @ModelAttribute("vm") VeiculoFormViewModel form) {
         updateVeiculoUseCase.execute(new UpdateVeiculoCommand(id, form));
-        return "redirect:/veiculos";
+        return "redirect:/veiculos/" + id + "/detalhes";
     }
 
     @PostMapping("/{id}/excluir")
@@ -88,42 +79,40 @@ public class VeiculoController {
         return "redirect:/veiculos";
     }
 
-    @GetMapping("/{id}/saida")
+    @GetMapping("/{id}/detalhes")
+    public String details(@PathVariable Long id, Model model) {
+        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        return "veiculo/detalhes";
+    }
+
+    @GetMapping("/{id}/saida-form")
     public String saidaForm(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getSaidaFormQueryHandler.execute(new GetSaidaFormQuery(id)));
-        return "veiculo/saida";
+        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        return "veiculo/fragments :: saida-form";
+    }
+
+    @GetMapping("/{id}/volta-form")
+    public String voltaForm(@PathVariable Long id, Model model) {
+        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        return "veiculo/fragments :: volta-form";
     }
 
     @PostMapping("/{id}/saida")
     public String registrarSaida(@PathVariable Long id,
-            @ModelAttribute("vm") VeiculoSaidaViewModel form,
-            RedirectAttributes redirectAttributes) {
-        try {
-            registerSaidaUseCase.execute(new RegisterSaidaCommand(id, form.getFuncSaidaId()));
-        } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("erro", e.getMessage());
-        }
-        return "redirect:/veiculos";
-    }
-
-    @GetMapping("/{id}/volta")
-    public String voltaForm(@PathVariable Long id, Model model) {
-        model.addAttribute("vm", getVoltaFormQueryHandler.execute(new GetVoltaFormQuery(id)));
-        return "veiculo/volta";
+            @RequestParam Long funcSaidaId,
+            Model model) {
+        registerSaidaUseCase.execute(new RegisterSaidaCommand(id, funcSaidaId));
+        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        return "veiculo/fragments :: details-content";
     }
 
     @PostMapping("/{id}/volta")
     public String registrarVolta(@PathVariable Long id,
-            @ModelAttribute("vm") VeiculoVoltaViewModel form) {
-        registerVoltaUseCase.execute(new RegisterVoltaCommand(id, form.getFuncVoltaId(), form.getKmPercorrido()));
-        return "redirect:/veiculos";
-    }
-
-    @GetMapping("/{id}/detalhes")
-    public String details(@PathVariable Long id, Model model) {
-        VeiculoDetailsViewModel vm = getVeiculoDetailsQuery.execute(new GetVeiculoDetailsQuery(id));
-        model.addAttribute("vm", vm);
-
-        return "veiculo/detalhes";
+            @RequestParam Long funcVoltaId,
+            @RequestParam Double kmPercorrido,
+            Model model) {
+        registerVoltaUseCase.execute(new RegisterVoltaCommand(id, funcVoltaId, kmPercorrido));
+        model.addAttribute("vm", getVeiculoDetailsQueryHandler.execute(new GetVeiculoDetailsQuery(id)));
+        return "veiculo/fragments :: details-content";
     }
 }
