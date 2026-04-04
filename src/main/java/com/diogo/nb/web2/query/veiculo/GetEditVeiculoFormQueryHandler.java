@@ -31,7 +31,8 @@ public class GetEditVeiculoFormQueryHandler implements QueryHandler<GetEditVeicu
         vm.setKm(v.getKm());
         vm.setStatus(v.getStatus());
         vm.setStatusOptions(Arrays.asList(StatusVeiculo.values()));
-        vm.setStatusBloqueado(movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).isPresent());
+        boolean statusBloqueado = movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).isPresent();
+        vm.setStatusBloqueado(statusBloqueado);
         return vm;
     }
 }

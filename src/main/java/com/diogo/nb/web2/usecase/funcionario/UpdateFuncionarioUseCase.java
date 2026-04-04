@@ -17,8 +17,9 @@ public class UpdateFuncionarioUseCase implements UseCase<UpdateFuncionarioComman
     @Override
     public void execute(UpdateFuncionarioCommand command) {
         Funcionario f = funcionarioRepository.findById(command.id()).orElseThrow();
-        f.setNome(command.form().getNome());
-        f.setContato(command.form().getContato());
+        var form = command.form();
+        f.setNome(form.getNome());
+        f.setContato(form.getContato());
         funcionarioRepository.save(f);
     }
 }

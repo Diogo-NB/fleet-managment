@@ -56,19 +56,20 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
     }
 
     private MovimentacaoRow toRow(Movimentacao m) {
+        String funcSaidaNome = funcionarioRepository.findById(m.getFuncSaidaId()).map(f -> f.getNome()).orElse("--");
+
         MovimentacaoRow row = new MovimentacaoRow();
         row.setVoltaPendente(m.isVoltaPendente());
         row.setKmPercorrido(m.getKmPercorrido());
         row.setDateSaida(m.getSaida().format(dateFormatter));
-        row.setFuncionarioSaida(
-                funcionarioRepository.findById(m.getFuncSaidaId()).map(f -> f.getNome()).orElse("--"));
+        row.setFuncionarioSaida(funcSaidaNome);
 
         if (m.isVoltaPendente()) {
             row.setFuncionarioVolta("--");
             row.setDateVolta("--");
         } else {
-            row.setFuncionarioVolta(
-                    funcionarioRepository.findById(m.getFuncVoltaId()).map(f -> f.getNome()).orElse("--"));
+            String funcVoltaNome = funcionarioRepository.findById(m.getFuncVoltaId()).map(f -> f.getNome()).orElse("--");
+            row.setFuncionarioVolta(funcVoltaNome);
             row.setDateVolta(m.getVolta().format(dateFormatter));
         }
 

@@ -20,14 +20,15 @@ public class UpdateVeiculoUseCase implements UseCase<UpdateVeiculoCommand> {
     @Override
     public void execute(UpdateVeiculoCommand command) {
         Veiculo v = veiculoRepository.findById(command.id()).orElseThrow();
-        if (command.form().getStatus() == StatusVeiculo.DISPONIVEL
-                && movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).isPresent()) {
+        var form = command.form();
+        boolean voltaPendente = movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).isPresent();
+        if (form.getStatus() == StatusVeiculo.DISPONIVEL && voltaPendente) {
             throw new IllegalStateException("Não é possível marcar o veículo como disponível enquanto há uma movimentação com volta pendente.");
         }
-        v.setModelo(command.form().getModelo());
-        v.setPlaca(command.form().getPlaca());
-        v.setAno(command.form().getAno());
-        v.setStatus(command.form().getStatus());
+        v.setModelo(form.getModelo());
+        v.setPlaca(form.getPlaca());
+        v.setAno(form.getAno());
+        v.setStatus(form.getStatus());
         veiculoRepository.save(v);
     }
 }
