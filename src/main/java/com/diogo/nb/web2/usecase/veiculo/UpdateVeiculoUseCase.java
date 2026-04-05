@@ -6,9 +6,11 @@ import com.diogo.nb.web2.repository.MovimentacaoRepository;
 import com.diogo.nb.web2.repository.VeiculoRepository;
 import com.diogo.nb.web2.usecase.UseCase;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -19,6 +21,7 @@ public class UpdateVeiculoUseCase implements UseCase<UpdateVeiculoCommand> {
 
     @Override
     public void execute(UpdateVeiculoCommand command) {
+        log.info("Updating veiculo id={}", command.id());
         Veiculo v = veiculoRepository.findById(command.id()).orElseThrow();
         var form = command.form();
         boolean voltaPendente = movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).isPresent();

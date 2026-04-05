@@ -1,0 +1,14 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout/fragments :: head('Erro')}" ></head>
+  <body class="min-h-screen bg-gray-50">
+    <nav th:replace="~{layout/fragments :: nav('')}"></nav>
+
+    <main class="max-w-lg mx-auto px-4 py-20 text-center">
+      <p class="text-6xl font-bold text-gray-200 mb-4">Erro</p>
+      <h1 class="text-xl font-semibold text-gray-800 mb-2">Algo deu errado</h1>
+      <p class="text-sm text-gray-500 mb-8" th:text="${message}"></p>
+      <a th:href="@{/veiculos}" class="text-sm text-blue-600 hover:underline">Voltar para Veículos</a>
+    </main>
+  </body>
+</html>

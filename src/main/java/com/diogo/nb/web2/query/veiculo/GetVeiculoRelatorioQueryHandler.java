@@ -3,6 +3,7 @@ package com.diogo.nb.web2.query.veiculo;
 import com.diogo.nb.web2.model.Funcionario;
 import com.diogo.nb.web2.model.Movimentacao;
 import com.diogo.nb.web2.model.Veiculo;
+import com.diogo.nb.web2.query.DateFormatters;
 import com.diogo.nb.web2.query.QueryHandler;
 import com.diogo.nb.web2.repository.FuncionarioRepository;
 import com.diogo.nb.web2.repository.VeiculoRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +27,6 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
     private final VeiculoRepository veiculoRepository;
     private final FuncionarioRepository funcionarioRepository;
 
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    private final DateTimeFormatter geradoEmFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
-
     @Override
     public VeiculoRelatorioViewModel execute(GetVeiculoRelatorioQuery query) {
         Map<Long, Funcionario> funcionariosById = funcionarioRepository.getAllMapped();
@@ -38,7 +35,7 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
                 .toList();
 
         VeiculoRelatorioViewModel vm = new VeiculoRelatorioViewModel();
-        vm.setGeradoEm(LocalDateTime.now().format(geradoEmFormatter));
+        vm.setGeradoEm(LocalDateTime.now().format(DateFormatters.DATE_TIME_VERBOSE));
         vm.setVeiculos(groups);
         return vm;
     }
@@ -62,7 +59,7 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
         MovimentacaoRow row = new MovimentacaoRow();
         row.setVoltaPendente(m.isVoltaPendente());
         row.setKmPercorrido(m.getKmPercorrido());
-        row.setDateSaida(m.getSaida().format(dateFormatter));
+        row.setDateSaida(m.getSaida().format(DateFormatters.DATE_TIME));
         row.setFuncionarioSaida(getNome(funcionariosById, m.getFuncSaidaId()));
 
         if (m.isVoltaPendente()) {
@@ -70,7 +67,7 @@ public class GetVeiculoRelatorioQueryHandler implements QueryHandler<GetVeiculoR
             row.setDateVolta("--");
         } else {
             row.setFuncionarioVolta(getNome(funcionariosById, m.getFuncVoltaId()));
-            row.setDateVolta(m.getVolta().format(dateFormatter));
+            row.setDateVolta(m.getVolta().format(DateFormatters.DATE_TIME));
         }
 
         return row;

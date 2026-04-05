@@ -4,6 +4,7 @@ import com.diogo.nb.web2.model.Funcionario;
 import com.diogo.nb.web2.model.Movimentacao;
 import com.diogo.nb.web2.model.StatusVeiculo;
 import com.diogo.nb.web2.model.Veiculo;
+import com.diogo.nb.web2.query.DateFormatters;
 import com.diogo.nb.web2.query.QueryHandler;
 import com.diogo.nb.web2.repository.FuncionarioRepository;
 import com.diogo.nb.web2.repository.MovimentacaoRepository;
@@ -14,7 +15,6 @@ import com.diogo.nb.web2.viewmodel.VeiculoDetailsViewModel.MovimentacaoRow;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +29,6 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
     private final VeiculoRepository veiculoRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final MovimentacaoRepository movimentacaoRepository;
-
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
     public VeiculoDetailsViewModel execute(GetVeiculoDetailsQuery query) {
@@ -63,7 +61,7 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         vm.setFuncionarios(funcionarios);
 
         movimentacaoRepository.findByVeiculoIdAndVoltaIsNull(v.getId()).ifPresentOrElse(
-                m -> vm.setSaidaPendente(m.getSaida().format(dateFormatter)),
+                m -> vm.setSaidaPendente(m.getSaida().format(DateFormatters.DATE_TIME)),
                 () -> vm.setPodeRegistrarSaida(v.getStatus() == StatusVeiculo.DISPONIVEL));
 
         return vm;
@@ -77,14 +75,14 @@ public class GetVeiculoDetailsQueryHandler implements QueryHandler<GetVeiculoDet
         row.setKmPercorrido(m.getKmPercorrido());
 
         row.setFuncionarioSaida(getNome(funcionariosById, m.getFuncSaidaId()));
-        row.setDateSaida(m.getSaida().format(dateFormatter));
+        row.setDateSaida(m.getSaida().format(DateFormatters.DATE_TIME));
 
         if (m.isVoltaPendente()) {
             row.setFuncionarioVolta("--");
             row.setDateVolta("--");
         } else {
             row.setFuncionarioVolta(getNome(funcionariosById, m.getFuncVoltaId()));
-            row.setDateVolta(m.getVolta().format(dateFormatter));
+            row.setDateVolta(m.getVolta().format(DateFormatters.DATE_TIME));
         }
 
         return row;
